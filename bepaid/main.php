@@ -10,7 +10,7 @@ if (isset($_POST[$id.'_submit']) && $_POST[$id.'_submit']) {
 	$shop_key = isset($pluginData->shop_key) ? $pluginData->shop_key : null;
 
 	$description = isset($pluginData->orderdescription) ? $pluginData->orderdescription : null;
-	$amount = isset($pluginData->sum) ? $pluginData->sum : null;
+	$amount = isset($pluginData->amount) ? $pluginData->amount : null;
   $amount = floatval($amount);
 	$currency = isset($pluginData->currency) ? $pluginData->currency : null;
   $test_mode = isset($pluginData->demo) ? $pluginData->demo : false;

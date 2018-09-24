@@ -1,21 +1,22 @@
 ElementRegister.registerPaymentGateway({
-	name: 'BePaid',
+	name: 'bePaid',
 	id: 'bepaid',
-	pageUrl: 'https://begateway.com/',
+	pageUrl: 'https://bepaid.by/',
 	keyFieldId: 'shop_id',
 	keyField2Id: 'shop_key',
 	keyField3Id: 'demo',
 	keyFieldDef: {type: 'HorizontalLayout', noPadding: true, columnWeights: [6,6,12], children: [
 		{type: 'TextField', placeholder: __('Shop ID'), id: 'key'},
-		{type: 'TextField', placeholder: __('Shop key'), id: 'key2'},
+		{type: 'TextField', placeholder: __('Secret key'), id: 'key2'},
 		{type: 'CheckBox', label: __('Test mode'), id: 'key3', css: {padding: 7, marginTop: 5, display: 'inline-block'}, init: function() {
 			this.getElem().attr('title', __('For testing purpose without real payments')).tooltip({placement: 'right'});
 		}}
 	]},
 	titleFieldId: 'label',
-	nameFieldId: 'ordername,orderdescription',
-	priceFieldId: 'sum',
-	globalVars: ['shop_id', 'shop_key']
+	nameFieldId: 'description',
+	priceFieldId: 'amount',
+  currencyFieldId: 'currency',
+	globalVars: ['shop_id', 'shop_key', 'demo']
 });
 
 PluginWrapper.registerPlugin('bepaid', {
@@ -31,11 +32,11 @@ PluginWrapper.registerPlugin('bepaid', {
 			{children: [
         {type: 'HorizontalLayout', spacing: 15, children: [
   				{type: 'VerticalLayout', children: [
-  					{type: 'Label', text: __('Shop ID'), helpText:__("Shop ID in your payment provider")},
+  					{type: 'Label', text: __('Shop ID')},
   					{type: 'TextField', id: 'shop_id'}
   				]},
   				{type: 'VerticalLayout', children: [
-  					{type: 'Label', text: __('Shop key'), helpText:__("Shop secret key issued by your payment provider")},
+  					{type: 'Label', text: __('Secret key')},
   					{type: 'TextField', id: 'shop_key'}
   				]}
         ]},
@@ -46,7 +47,7 @@ PluginWrapper.registerPlugin('bepaid', {
   				]},
 					{type: 'VerticalLayout', children: [
 						{type: 'Label', text: __('Amount'), helpText: __("Amount to be transferred")},
-						{type: 'TextField', id: 'sum'}
+						{type: 'TextField', id: 'amount'}
 					]},
           {type: 'VerticalLayout', children: [
             {type: 'Label', text: __('Currency')},
@@ -137,7 +138,7 @@ PluginWrapper.registerPlugin('bepaid', {
 		fields.shop_id.setText(data.content.shop_id);
 		fields.shop_key.setText(data.content.shop_key);
 		fields.orderdescription.setText(data.content.orderdescription);
-		fields.sum.setText(data.content.sum);
+		fields.amount.setText(data.content.amount);
 
     var itm;
     itm = fields.currency.getItemById('#' + data.content.currency);
@@ -155,7 +156,7 @@ PluginWrapper.registerPlugin('bepaid', {
 		data.content.shop_id = fields.shop_id.getText();
 		data.content.shop_key = fields.shop_key.getText();
 		data.content.orderdescription = fields.orderdescription.getText();
-		data.content.sum = fields.sum.getText();
+		data.content.amount = fields.amount.getText();
     var itm;
     itm = fields.currency.getSelectedItem();
     data.content.currency = itm.getOriginal().value;
@@ -189,7 +190,7 @@ PluginWrapper.registerPlugin('bepaid', {
 		if (!data.content.shop_id) data.content.shop_id = '4225';
 		if (!data.content.shop_key) data.content.shop_key = '3834fbef1fe6ea024ef77f5c79ec7ff1ba710ea6241c08c2f341afda8af4c1c4';
 		if (!data.content.ordername) data.content.orderdescription = __('Demo payment');
-		if (!data.content.sum) data.content.sum = '1';
+		if (!data.content.amount) data.content.amount = '1';
     if (!data.content.currency) data.content.currency = 'BYN';
 
 		if (!data.content.button_label) data.content.button_label = __('Proceed to payment');

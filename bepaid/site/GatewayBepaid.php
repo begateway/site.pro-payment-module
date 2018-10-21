@@ -23,11 +23,9 @@ class GatewayBepaid extends PaymentGateway {
 	}
 
 	public function getTransactionId() {
-    \BeGateway\Settings::$shopId = $this->_shop_id;
-    \BeGateway\Settings::$shopKey = $this->_shop_key;
     $webhook = new \BeGateway\Webhook;
 
-    if ($webhook->isAuthorized() && $webhook->getTrackingId()) {
+    if ($webhook->getTrackingId()) {
       return $webhook->getTrackingId();
     }
     return null;
@@ -60,7 +58,7 @@ class GatewayBepaid extends PaymentGateway {
       	$transaction = new \BeGateway\GetPaymentToken;
         $transaction->money->setAmount($amount);
         $transaction->money->setCurrency($currency);
-        $transaction->setDescription($description);
+        $transaction->setDescription($description . ' # '. $orderId);
         $transaction->setTrackingId($orderId);
         $transaction->setLanguage($this->_lang);
 
@@ -109,20 +107,29 @@ class GatewayBepaid extends PaymentGateway {
     \BeGateway\Settings::$shopKey = $this->_shop_key;
     $webhook = new \BeGateway\Webhook;
     $status = false;
+    $message = 'failed';
 
-    if ($order && $webhook->isAuthorized()) {
-			if ($webhook->isFailed()) {
-				$order->setState(StoreModuleOrder::STATE_FAILED);
-      } elsif ($webhook->isPending() || $webhook->isIncomplete()) {
-        $order->setState(StoreModuleOrder::STATE_PENDING);
-			} elsif ($webhook->isSuccess()) {
-        $order->setState(StoreModuleOrder::STATE_COMPLETE);
-        $status = true;
-			}
-      $order->save();
-		}
+    if ($order) {
+      if ($webhook->isAuthorized()) {
+  			if ($webhook->isFailed()) {
+  				$order->setState(StoreModuleOrder::STATE_FAILED);
+        } elseif ($webhook->isPending() || $webhook->isIncomplete()) {
+          $order->setState(StoreModuleOrder::STATE_PENDING);
+          $message = 'pending';
+  			} elseif ($webhook->isSuccess()) {
+          $order->setState(StoreModuleOrder::STATE_COMPLETE);
+          $status = true;
+          $message = 'success';
+  			}
+        $order->save();
+      } else {
+        $message = 'not authorized';
+      }
+		} else {
+      $message = 'order not found';
+    }
 		header('HTTP/1.0 200 OK');
-		echo "OK $status";
+		echo $message;
 		return $status;
 	}
 }
